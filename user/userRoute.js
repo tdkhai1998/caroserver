@@ -5,23 +5,25 @@ var passport = require("passport");
 const jwt = require("jsonwebtoken");
 router.post("/register", (req, res, next) => {
   const { username, password, repassword } = req.body;
+  console.log(req.body);
   if (username && password && repassword && password === repassword) {
     return userModel
       .findOne(username)
       .then(async r => {
         if (r.length > 0) {
-          res.send("account have already existed");
+          res.json("account have already existed");
         } else {
           const id = await userModel.add(
             "user",
             userModel.createEntity(username, password)
           );
-          res.send("created account successfully");
+          res.json(JSON.stringify({ code: 1, message: "successfull" }));
         }
       })
       .catch(e => next(e));
   } else {
-    res.send("Req don't have enough field (username, password,repassword) ");
+    console.log("do");
+    res.json("Req don't have enough field (username, password,repassword) ");
   }
 });
 router.post("/login", function(req, res, next) {
