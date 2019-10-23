@@ -26,20 +26,23 @@ router.post("/register", (req, res, next) => {
     res.json("Req don't have enough field (username, password,repassword) ");
   }
 });
+router.get("/logout", function(req, res, next) {
+  req.logOut();
+  return res.json(JSON.stringify({ code: 1, message: "successfull" }));
+});
 router.post("/login", function(req, res, next) {
   passport.authenticate("local", { session: false }, (err, user, info) => {
     if (err || !user) {
-      return res.status(400).json({
-        message: info ? info.message : "Login failed",
-        user: user
-      });
+      return res
+        .status(400)
+        .json(JSON.stringify({ code: -1, message: "failed" }));
     }
     req.login(user, { session: false }, err => {
       if (err) {
-        res.send(err);
+        res.json(JSON.stringify({ code: -1, message: "failed" }));
       }
       const token = jwt.sign(JSON.stringify(user), "your_jwt_secret");
-      return res.json({ user, token });
+      return res.json(JSON.stringify({ code: 1, user, token }));
     });
   })(req, res);
 });

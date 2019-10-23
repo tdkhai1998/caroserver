@@ -30,7 +30,7 @@ passport.use(
             return cb(null, false, { message: "Incorrect email or password." });
         })
         .catch(err => {
-          return cb(err);
+          return cb(err).catch(err => console.log(err));
         });
     }
   )
