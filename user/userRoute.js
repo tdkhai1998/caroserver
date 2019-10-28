@@ -42,7 +42,7 @@ router.post("/login", function(req, res, next) {
         res.json(JSON.stringify({ code: -1, message: "failed" }));
       }
       const token = jwt.sign(JSON.stringify(user), "your_jwt_secret");
-      return res.json(JSON.stringify({ code: 1, user, token }));
+      return res.json(JSON.stringify({ code: 1, user: user.username, token }));
     });
   })(req, res);
 });

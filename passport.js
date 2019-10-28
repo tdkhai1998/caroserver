@@ -22,6 +22,7 @@ passport.use(
             return cb(null, false, { message: "Incorrect email or password." });
           }
           const user = result[0];
+          console.log(user);
           if (bcrypt.compareSync(password, user.password))
             return cb(null, user, {
               message: "Logged In Successfully"
@@ -44,6 +45,7 @@ passport.use(
     },
     function(jwtPayload, cb) {
       //find the user in db if needed
+      console.log("...", jwtPayload);
       return userModel
         .findOne(jwtPayload.username)
         .then(user => {
