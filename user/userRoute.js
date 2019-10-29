@@ -60,6 +60,8 @@ router.put('/:id', function(req, res, next) {
     });
     delete req.body.avatar;
     const { body } = req;
+    console.log(req.body);
+
     const entity = userModel.createEmptyEntity();
     for (key in entity) {
       if (key === 'ngaysinh') entity.ngaysinh = new Date(body.ngaysinh);
@@ -69,7 +71,9 @@ router.put('/:id', function(req, res, next) {
     console.log(entity);
     userModel
       .update(entity)
-      .then(() => {
+      .then(r => {
+        console.log(r);
+
         return res.json(JSON.stringify({ code: 1, message: 'Success' }));
       })
       .catch(e => {
@@ -133,7 +137,7 @@ router.post('/loginFace', (req, res, next) => {
           if (err) console.log(err);
           console.log('Ghi File Thành Công');
         });
-        return userModel.add('user', user).then(() => {
+        return userModel.add('user', user).then(r => {
           const token = jwt.sign(JSON.stringify(user), 'your_jwt_secret');
           return res.json(
             JSON.stringify({ code: 1, user: user.username, token })

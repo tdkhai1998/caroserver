@@ -1,12 +1,12 @@
-var mysql = require("mysql");
+var mysql = require('mysql');
 
 var createConnection = () => {
   return mysql.createConnection({
-    host: "remotemysql.com",
+    host: 'remotemysql.com',
     port: 3306,
-    user: "IVJw1noOAC",
-    password: "yYKVsycAot",
-    database: "IVJw1noOAC"
+    user: 'IVJw1noOAC',
+    password: 'yYKVsycAot',
+    database: 'IVJw1noOAC'
   });
 };
 module.exports = {
@@ -66,7 +66,7 @@ module.exports = {
         if (error) {
           reject(error);
         } else {
-          resolve(value.changedRows);
+          resolve(value);
         }
         connection.end();
       });
