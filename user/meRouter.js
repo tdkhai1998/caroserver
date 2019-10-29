@@ -8,8 +8,12 @@ const model = require("./userModel");
 router.get("/", (req, res, next) => {
   return model
     .findOne(req.user.username)
-    .then(([r]) => {
+    .then(async ([r]) => {
       r.password = undefined;
+      const fs = require("fs");
+      const path = `${req.user.username}.txt`;
+      const data = fs.readFileSync(path, "utf-8");
+      r.avatar = data;
       res.json(JSON.stringify({ code: 1, data: r }));
     })
     .catch(e => res.json(JSON.stringify({ code: -1, error: e.message })));

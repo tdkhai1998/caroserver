@@ -44,8 +44,6 @@ passport.use(
       secretOrKey: "your_jwt_secret"
     },
     function(jwtPayload, cb) {
-      //find the user in db if needed
-      console.log("...", jwtPayload);
       return userModel
         .findOne(jwtPayload.username)
         .then(user => {
@@ -58,3 +56,10 @@ passport.use(
     }
   )
 );
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
