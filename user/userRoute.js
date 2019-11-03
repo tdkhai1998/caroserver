@@ -9,7 +9,6 @@ var re = require("../bin/www");
 
 router.post("/register", async (req, res, next) => {
     const {username, password, repassword} = req.body;
-    console.log(req.body);
     if (username && password && repassword && password === repassword) {
         return userModel
             .findOne(username)

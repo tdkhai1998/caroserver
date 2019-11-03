@@ -9,7 +9,6 @@ module.exports = {
     update: entity => db.update("user", "username", entity),
     createEntity: (username, password) => ({
         username,
-
         hoten: "",
         ngaysinh: new Date(),
         gioitinh: true,

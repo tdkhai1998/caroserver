@@ -2,9 +2,8 @@ var express = require("express");
 var router = express.Router();
 
 const model = require("./userModel");
-
+console.log();
 router.get("/", (req, res, next) => {
-    console.log(req.io);
     return model
         .findOne(req.user.username)
         .then(async ([r]) => {

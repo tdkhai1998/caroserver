@@ -44,10 +44,9 @@ let roomId = 0;
 let pairs = 0;
 let room = [];
 let slot = [];
-io.on("connection", (socket,i) => {
-    console.log(i)
+io.on("connection", socket => {
     socket.join(roomId);
-    socket.emit("get-room", roomId, "you are the " + (pairs + 1));
+    socket.emit("get-room", roomId, pairs + 1);
     if (pairs === 0) {
         slot[0] = socket;
         pairs++;
@@ -60,6 +59,22 @@ io.on("connection", (socket,i) => {
         roomId++;
     }
     socket.on("have-enough", () => {});
+    socket.on("winner", (turn, room) => {
+        console.log(turn, room);
+    });
+    socket.on("request-Undo", (room, num) => {
+        console.log(room, num, "request_undo");
+        socket.in(room).emit("requestForUndo", num);
+    });
+    socket.on("play", (value, room) => {
+        console.log(value);
+        console.log(room);
+        socket.in(room).emit("play", value);
+    });
+    socket.on("accept-request", room => {
+        console.log("accept");
+        socket.in(room).emit("accept-request");
+    });
     socket.on("endGame", Id => {
         delete room[Id];
     });
