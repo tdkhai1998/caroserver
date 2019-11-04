@@ -9,13 +9,12 @@ var re = require("../bin/www");
 
 router.post("/register", async (req, res, next) => {
     const {username, password, repassword} = req.body;
+
     if (username && password && repassword && password === repassword) {
         return userModel
             .findOne(username)
             .then(async r => {
-                console.log(r);
                 if (r.length > 0) {
-                    console.log("taikhoan da ton tại");
                     return res.json(
                         JSON.stringify({
                             code: -1,
@@ -63,7 +62,7 @@ router.get("/logout", (req, res) => {
     return res.json(JSON.stringify({code: 1, message: "successfull"}));
 });
 router.post("/login", (req, res) => {
-    console.log(req.io);
+    console.log(req.body);
     passport.authenticate("local", (err, user) => {
         if (err || !user) {
             return res
@@ -72,7 +71,7 @@ router.post("/login", (req, res) => {
         }
         req.login(user, {session: true}, err => {
             if (err) {
-                res.json(JSON.stringify({code: -1, message: "failed"}));
+                res.json(JSON.stringify({code: -1, message: err.message}));
             }
             const token = jwt.sign(JSON.stringify(user), "your_jwt_secret");
             return res.json(
@@ -115,7 +114,7 @@ router.put("/", (req, res) => {
             });
     } catch (e) {
         console.log(e);
-        return res.sendStatus(400);
+        return res.json(JSON.stringify({code: -1, message: "Success"}));
     }
 });
 router.post("/changePassword", async (req, res) => {

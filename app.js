@@ -35,11 +35,9 @@ console.log("sxdcfvgbhn");
 //--------------------------------------------------------------view engine setup4
 require("./middlewares/session")(app);
 require("./middlewares/passport")(app);
+var bodyParser = require("body-parser");
+app.use(bodyParser.text({limit: "20MB"}));
 
-app.use(function(request, response, next) {
-    request.io = io;
-    next();
-});
 let roomId = 0;
 let pairs = 0;
 let room = [];
@@ -58,6 +56,14 @@ io.on("connection", socket => {
         pairs = 0;
         roomId++;
     }
+    socket.on("start-chat", (room, name, avt) => {
+        console.log("start chat", room, name, avt);
+        socket.in(room).emit("start-chat", name, avt);
+    });
+    socket.on("chat", (room, mess) => {
+        console.log("chat", room, mess);
+        socket.in(room).emit("chat", mess);
+    });
     socket.on("have-enough", () => {});
     socket.on("winner", (turn, room) => {
         console.log(turn, room);
@@ -98,8 +104,6 @@ io.on("joinGame", function(data) {
     }
 });
 
-const bodyParser = require("body-parser");
-
 let allowCrossDomain = function(_req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "*");
@@ -110,20 +114,22 @@ let allowCrossDomain = function(_req, res, next) {
     next();
 };
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json({limit: "20mb"}));
-app.use(bodyParser.urlencoded({extended: true, limit: "20mb"}));
 app.use(allowCrossDomain);
+
 app.options("*", (_req, res) => {
     res.sendStatus(200);
 });
+
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "hbs");
 app.use(logger("dev"));
-app.use(bodyParser.json());
-app.use(express.json());
-app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use((req, res, next) => {
+    try {
+        req.body = JSON.parse(req.body);
+    } catch (e) {}
+    next();
+});
 
 //------------------------------------------------------------routes
 app.use("/", require("./routes/index"));
