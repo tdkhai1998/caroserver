@@ -43,19 +43,21 @@ let pairs = 0;
 let room = [];
 let slot = [];
 io.on("connection", socket => {
-    socket.join(roomId);
-    socket.emit("get-room", roomId, pairs + 1);
-    if (pairs === 0) {
-        slot[0] = socket;
-        pairs++;
-    } else {
-        slot[1] = socket;
-        room[roomId] = slot;
-        socket.nsp.in(roomId).emit(`have-enough`, roomId);
-        socket.in(roomId).emit("nickname");
-        pairs = 0;
-        roomId++;
-    }
+    socket.on("find", () => {
+        socket.join(roomId);
+        socket.emit("get-room", roomId, pairs + 1);
+        if (pairs === 0) {
+            slot[0] = socket;
+            pairs++;
+        } else {
+            slot[1] = socket;
+            room[roomId] = slot;
+            socket.nsp.in(roomId).emit(`have-enough`, roomId);
+            socket.in(roomId).emit("nickname");
+            pairs = 0;
+            roomId++;
+        }
+    });
     socket.on("start-chat", (room, name, avt) => {
         console.log("start chat", room, name, avt);
         socket.in(room).emit("start-chat", name, avt);
@@ -73,7 +75,7 @@ io.on("connection", socket => {
         socket.in(room).emit("requestForUndo", num);
     });
     socket.on("play", (value, room) => {
-        console.log(value);
+        console.log("olapy", value);
         console.log(room);
         socket.in(room).emit("play", value);
     });
@@ -81,6 +83,15 @@ io.on("connection", socket => {
         console.log("accept");
         socket.in(room).emit("accept-request");
     });
+    socket.on("reject-Undo", room => {
+        console.log("accept");
+        socket.in(room).emit("RejectedUndoRespone");
+    });
+    socket.on("leaveRoom", room => {
+        socket.in(room).emit("YouAreAlone");
+        delete socket;
+    });
+
     socket.on("endGame", Id => {
         delete room[Id];
     });
