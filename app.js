@@ -42,21 +42,39 @@ let roomId = 0;
 let pairs = 0;
 let room = [];
 let slot = [];
+let rooms = {};
+let stateRoom = {};
 io.on("connection", socket => {
-    socket.on("find", () => {
+    socket.on("find", username => {
+        // if (!rooms.username) {
         socket.join(roomId);
+        rooms[username] = roomId;
         socket.emit("get-room", roomId, pairs + 1);
         if (pairs === 0) {
             slot[0] = socket;
             pairs++;
         } else {
+            stateRoom[roomId] = {
+                history: [],
+            };
             slot[1] = socket;
             room[roomId] = slot;
             socket.nsp.in(roomId).emit(`have-enough`, roomId);
-            socket.in(roomId).emit("nickname");
             pairs = 0;
             roomId++;
         }
+    });
+    socket.on("request", (codeReq, room, num) => {
+        console.log(room, num, codeReq, "request_undo");
+        socket.in(room).emit("haveRequest", codeReq, num);
+    });
+    socket.on("LoseAcception", r => {
+        console.log("LoseAcception");
+        socket.in(r).emit("ReqLoseBeAccepted");
+    });
+    socket.on("askForLose", room => {
+        console.log("lose");
+        socket.in(room).emit("askForLose_req");
     });
     socket.on("start-chat", (room, name, avt) => {
         console.log("start chat", room, name, avt);
@@ -70,7 +88,7 @@ io.on("connection", socket => {
     socket.on("winner", (turn, room) => {
         console.log(turn, room);
     });
-    socket.on("request-Undo", (room, num) => {
+    socket.on("request", (room, num) => {
         console.log(room, num, "request_undo");
         socket.in(room).emit("requestForUndo", num);
     });
@@ -83,9 +101,9 @@ io.on("connection", socket => {
         console.log("accept");
         socket.in(room).emit("accept-request");
     });
-    socket.on("reject-Undo", room => {
-        console.log("accept");
-        socket.in(room).emit("RejectedUndoRespone");
+    socket.on("reject", room => {
+        console.log("Reject");
+        socket.in(room).emit("beRejected");
     });
     socket.on("leaveRoom", room => {
         socket.in(room).emit("YouAreAlone");
@@ -101,7 +119,7 @@ io.on("createGame", function(data) {
     socket.emit("newGame", {name: data.name, room: "room-" + rooms});
 });
 
-/**
+/**N
  * Connect the Player 2 to the room he requested. Show error if room full.
  */
 io.on("joinGame", function(data) {
