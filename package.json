@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "watch": "babel app.js --watch --out-file bin/app-compiled.js",
-    "start": "node app"
+    "start": "nodemon app"
   },
   "dependencies": {
     "bcrypt": "^3.0.6",
